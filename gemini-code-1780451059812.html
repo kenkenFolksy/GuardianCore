@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardianCore - Discord Security Bot</title>
+    <style>
+        /* 全体のリセットと共通設定 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f17;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        a {
+            color: #00f0ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: #00bfff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: rgba(11, 15, 23, 0.9);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00f0ff;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle, #00f0ff 0%, #0b0f17 70%);
+            border: 2px solid #00f0ff;
+            border-radius: 50%;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav a, nav .menu-trigger {
+            color: #94a3b8;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav .menu-trigger:hover {
+            color: #00f0ff;
+        }
+
+        /* メインビジュアル（ヒーローセクション） */
+        .hero {
+            padding: 180px 0 100px 0;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.1) 0%, rgba(11, 15, 23, 0) 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+            color: #0b0f17;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+            color: #ffffff;
+        }
+
+        /* セクション共通 */
+        section {
+            padding: 80px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        section h2 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #ffffff;
+            position: relative;
+        }
+
+        section h2::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #00f0ff;
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        /* 特徴・機能（カードデザイン） */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid #00f0ff;
+            padding: 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #00f0ff;
+            box-shadow: 0 10px 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* コマンド一覧（テーブルデザイン） */
+        .table-wrapper {
+            overflow-x: auto;
+            background-color: #111827;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px 20px;
+        }
+
+        th {
+            background-color: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(0, 240, 255, 0.2);
+        }
+
+        tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .cmd-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cmd-name {
+            font-family: monospace;
+            color: #00f0ff;
+            background-color: rgba(0, 240, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        /* コピーボタンのスタイル */
+        .copy-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: #94a3b8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            border-color: #00f0ff;
+        }
+
+        .copy-btn.copied {
+            background-color: rgba(0, 255, 128, 0.1);
+            color: #00ff80;
+            border-color: #00ff80;
+        }
+
+        /* モーダル（規約ポップアップ）のスタイル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #111827;
+            border: 1px solid #00f0ff;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80%;
+            border-radius: 12px;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
+        }
+
+        .modal-content h3 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+
+        .modal-body h4 {
+            color: #e2e8f0;
+            margin: 15px 0 5px 0;
+        }
+
+        /* フッター */
+        footer {
+            background-color: #070a10;
+            padding: 40px 0;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a, .footer-links span {
+            margin: 0 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .footer-links span:hover {
+            color: #00f0ff;
+        }
+
+        /* レスポンシブ（スマホ対応） */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            header .container { flex-direction: column; gap: 15px; padding: 15px 0; }
+            nav ul { gap: 12px; flex-wrap: wrap; justify-content: center; }
+            nav a, nav .menu-trigger { font-size: 0.9rem; }
+            td { padding: 12px 10px; }
+            .cmd-container { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .footer-links { display: flex; flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                GuardianCore
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#about">概要</a></li>
+                    <li><a href="#features">機能</a></li>
+                    <li><a href="#commands">コマンド</a></li>
+                    <li><span class="menu-trigger" onclick="openModal('tosModal')">利用規約</span></li>
+                    <li><span class="menu-trigger" onclick="openModal('privacyModal')">プライバシーポリシー</span></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>GuardianCore</h1>
+            <p>サーバーの安全を最高水準で守る。荒らし対策、グローバルバン、高度な認証機能を備えた多機能 Discord セキュリティ Bot。</p>
+            <a href="https://discord.com/oauth2/authorize?client_id=1507939208067551244" class="btn" target="_blank">サーバーに導入する</a>
+        </div>
+    </div>
+
+    <section id="about">
+        <div class="container">
+            <h2>GuardianCore とは</h2>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; color: #94a3b8;">
+                <p style="margin-bottom: 20px;">GuardianCoreは、コミュニティの安全を最優先に考えて開発されたDiscordbotです。</p>
+                <p>悪質なユーザーによる荒らし行為を未然に防ぎ、運営陣がより簡単かつ確実にサーバーを管理・保護できる環境を提供します。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <h2>主要機能</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>強固なセキュリティ機能</h3>
+                    <p>不正なリンクや招待リンク、さらにはサーバー破壊を目的としたnukeBotの自動キックなど、あらゆる脅威からサーバーを保護します。</p>
+                </div>
+                <div class="feature-card">
+                    <h3>高度な認証・ホワイトリスト</h3>
+                    <p>Botの導入を事前に防ぐ高性能な認証システムを搭載。信頼できるユーザーをホワイトリスト化してスムーズな運用をサポートします。</p>
+                </div>
+                <div class="feature-card">
+                    <h3>ログ・モデレーション管理</h3>
+                    <p>暴言や不適切な言葉を自動検知して削除。スパム検知やキック・ミュートなどの処罰記録を指定したチャンネルへリアルタイムで送信します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="commands">
+        <div class="container">
+            <h2>コマンド一覧</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>コマンド</th>
+                            <th>機能・詳細</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/toggle_url_filter</span>
+                                    <button class="copy-btn" onclick="copyCommand('/toggle_url_filter', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>不正なリンクや招待リンクの検知をON/OFFします。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">有効にすると、サーバー内で投稿された怪しいURLや他のサーバーへの招待リンクを自動的に検知し、メッセージを削除します。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/toggle_toxic_filter</span>
+                                    <button class="copy-btn" onclick="copyCommand('/toggle_toxic_filter', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>暴言・不適切な言葉の検知をON/OFFします。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">暴言や不快な言葉が含まれるメッセージを検知し、自動的に削除します。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/log_channel</span>
+                                    <button class="copy-btn" onclick="copyCommand('/log_channel', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>セキュリティログの送信先を指定します。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">スパム検知やキック・ミュートなどの処罰記録を、指定したチャンネル（例: #security-log など）に自動送信させる設定です。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/whitelist</span>
+                                    <button class="copy-btn" onclick="copyCommand('/whitelist', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>指定したユーザーをホワイトリストに登録、削除できます。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">指定したユーザーは、スパムなどで検出されません。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/toggle_nuke_filter</span>
+                                    <button class="copy-btn" onclick="copyCommand('/toggle_nuke_filter', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>高性能nuke検知！</strong><br><span style="color:#94a3b8; font-size:0.9rem;">nukeBotを自動でキックします。（Botのロールを上にする必要があります）</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/punish</span>
+                                    <button class="copy-btn" onclick="copyCommand('/punish', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>処罰できます。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">処罰し、本人に通知します。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/verify_panel</span>
+                                    <button class="copy-btn" onclick="copyCommand('/verify_panel', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>認証機能！</strong><br><span style="color:#94a3b8; font-size:0.9rem;">Botの導入を事前に防ぐ、高性能認証機能です。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/report</span>
+                                    <button class="copy-btn" onclick="copyCommand('/report', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>GuardianCore運営に規約違反ユーザーを通報します。</strong><br><span style="color:#94a3b8; font-size:0.9rem;">ご報告いただけましたら幸いです。当該ユーザーに監査を実施します。</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cmd-container">
+                                    <span class="cmd-name">/create_embed</span>
+                                    <button class="copy-btn" onclick="copyCommand('/create_embed', this)">コピー</button>
+                                </div>
+                            </td>
+                            <td><strong>embedを簡単に作成できます！</strong><br><span style="color:#94a3b8; font-size:0.9rem;">GuardianCore公式サーバーへの参加が必要です。</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div id="tosModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('tosModal')">&times;</span>
+            <h3>利用規約</h3>
+            <div class="modal-body">この利用規約（以下「本規約」といいます）は、GuardianCore運営者（以下「運営者」といいます）が提供するDiscord BOT「GuardianCore」（以下「本サービス」といいます）の利用条件を定めるものです。本サービスを導入したサーバー管理者および利用者は、本規約に同意したものとみなされます。
+
+<h4>第1条（目的）</h4>本サービスは、Discordサーバーのセキュリティ強化、荒らし対策、および管理支援を目的として提供されます。
+
+<h4>第2条（禁止事項）</h4>ユーザーは、本サービスの利用にあたり、以下の行為を行ってはなりません。
+・本サービスを悪用し、他のサーバーや利用者に損害を与える行為。
+・本サービスのプログラムを改ざん、複製、リバースエンジニアリングする行為。
+・BOT의運営を妨害し、またはサーバーへの過度な負荷をかける行為。
+・本サービスを通じて取得した情報を、不正な目的で利用する行為。
+・その他、運営者が不適切と判断する行為。
+
+<h4>第3条（免責事項）</h4>・本サービスの利用により生じたいかなる損害（データ消失、サーバーの機能停止、アカウントの制限等）についても、運営者は一切の責任を負いません。
+・本サービスは現状有姿で提供されるものであり、常に正常に動作することや、特定の目的への適合性を保証するものではありません。
+・サーバー内のセキュリティ設定（フィルターのON/OFF等）は管理者様の責任において適切に管理してください。
+
+<h4>第4条（サービス内容の変更・終了）</h4>運営者は、ユーザーへの事前の通知なく、本サービスの機能の全部または一部を変更、または提供を一時的もしくは永久に停止・終了することができるものとします。
+
+<h4>第5条（プライバシーの保護）</h4>本サービスでは、機能提供およびセキュリティ維持のために必要な最小限のデータ（ユーザーID、サーバーID、メッセージログの一部など）を取得する場合があります。これらのデータは、本サービスの提供以外の目的には利用されず、第三者に開示されることはありません。
+
+<h4>第6条（規約の変更）</h4>運営者は、本規約をいつでも任意に変更できるものとし、変更後の規約は本サイトに掲載した時点から効力を生じるものとします。
+
+<h4>第7条（お問い合わせ）</h4>本サービスに関するお問い合わせは、以下の連絡先までお願いいたします。
+連絡先：kenkenfolksy_yt
+公式本部サーバー：https://discord.gg/haXX62m7k3</div>
+        </div>
+    </div>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('privacyModal')">&times;</span>
+            <h3>プライバシーポリシー</h3>
+            <div class="modal-body">GuardianCore（以下「当BOT」といいます）は、ユーザーのプライバシーを尊重し、個人情報の保護に努めます。当BOTの利用にあたって収集される情報の取り扱いについて、以下の通りプライバシーポリシーを定めます。
+
+<h4>第1条（収集する情報）</h4>当BOTは、以下の情報を取得する場合があります。
+・Discordの識別子: ユーザーID、サーバーIDなど。
+・メッセージ情報: スパム検知、暴言検知、URLフィルタリング機能を提供するために必要なメッセージの内容。
+・操作ログ: サーバー内でのチャンネル作成、削除、ロール操作などの監査ログ。
+
+<h4>第2条（利用目的）</h4>取得した情報は、以下の目的のために利用されます。
+・当BOTの防衛・管理機能の提供。
+・セキュリティログの作成および管理者への通知。
+・BOTの不具合調査および品質改善。
+・規約違反者に対する警告や対応。
+
+<h4>第3条（情報の第三者提供）</h4>当BOTは、法令に基づく場合や、ユーザーの同意がある場合を除き、取得した情報を第三者に開示・提供することはありません。
+
+<h4>第4条（データの保持と削除）</h4>当BOTが保持するデータ（JSONファイル等）は、本サービスの提供に必要な期間のみ保持されます。特定のユーザーがデータの削除を希望される場合は、下記連絡先までお問い合わせください。可能な範囲で迅速に対応いたします。
+
+<h4>第5条（免責）</h4>当BOTがDiscordのAPIを通じて取得する情報は、Discordの利用規約およびプライバシーポリシーに従うものとします。Discord側の仕様変更により生じたデータ取り扱いの変化については、当BOT運営者は責任を負いかねます。
+
+<h4>第6条（プライバシーポリシーの改定）</h4>運営者は、必要に応じて本プライバシーポリシーを改定できるものとします。改定した場合は、本サイトに掲載した時点からその効力を生じるものとします。
+
+<h4>第7条（お問い合わせ）</h4>本プライバシーポリシーに関するお問い合わせは、以下までお願いいたします。
+連絡先：kenkenfolksy_yt
+公式本部サーバー：https://discord.gg/haXX62m7k3</div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://discord.gg/haXX62m7k3" target="_blank">公式Discordサーバー</a>
+                <a href="https://discord.com/oauth2/authorize?client_id=1507939208067551244" target="_blank">Botを導入</a>
+                <span onclick="openModal('tosModal')">利用規約</span>
+                <span onclick="openModal('privacyModal')">プライバシーポリシー</span>
+            </div>
+            <p>&copy; 2026 GuardianCore. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // コマンドコピー機能
+        function copyCommand(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'コピー完了！';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 1500);
+            }).catch(err => {
+                console.error('コピーに失敗しました: ', err);
+            });
+        }
+
+        // モーダル操作機能
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // モーダルの外側をクリックした時も閉じるようにする設定
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
