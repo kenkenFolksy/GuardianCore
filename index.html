@@ -692,6 +692,48 @@
             });
         }
 
+        <!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>GuardianCore - 認証結果</title>
+    <style>
+        body { background-color: #0b0f17; color: #e2e8f0; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #111827; padding: 40px; border-radius: 12px; border: 1px solid #00f0ff; text-align: center; box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); width: 90%; max-width: 400px; }
+        h1 { color: #00f0ff; margin-bottom: 20px; }
+        .status-box { margin: 25px 0; padding: 20px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid #334155; }
+        .status-clean { color: #00ff80; font-weight: bold; }
+        .status-banned { color: #ff3333; font-weight: bold; }
+        .btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #00f0ff; color: #0b0f17; border-radius: 5px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>認証完了</h1>
+        <p>ユーザーデータを確認しました。</p>
+        
+        <div class="status-box">
+            <div>ユーザーID: <span id="user-id">XXXXXXXXXXXX</span></div>
+            <div style="margin-top:10px;">ステータス: <span id="status-text" class="status-clean">確認中...</span></div>
+            <div id="reason-text" style="font-size: 0.9rem; color: #94a3b8; margin-top: 10px;"></div>
+        </div>
+
+        <a href="/" class="btn">トップページへ戻る</a>
+    </div>
+
+    <script>
+        // サーバーから渡された情報をここに埋め込むか、
+        // フロントエンド側で再度APIを叩いて情報を取得します
+        const status = "/* ここにstatus */";
+        const reason = "/* ここにreason */";
+        
+        document.getElementById('status-text').className = status === 'banned' ? 'status-banned' : 'status-clean';
+        document.getElementById('status-text').innerText = status === 'banned' ? 'BANされています' : '正常';
+        document.getElementById('reason-text').innerText = reason;
+    </script>
+</body>
+</html>
+
         // --- 背景キャンバスと赤丸カーソルの連動ロジック ---
         const canvas = document.getElementById('trailCanvas');
         const ctx = canvas.getContext('2d');
