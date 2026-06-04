@@ -36,6 +36,20 @@
             color: #00bfff;
         }
 
+        /* 異議申し立て用スタイル追加 */
+        .appeal-btn {
+            display: inline-block;
+            background: #5865F2;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 15px;
+            transition: 0.3s;
+        }
+        .appeal-btn:hover { background: #4752C4; }
+
         /* 背景で緑色の軌跡を描画するキャンバス */
         #trailCanvas {
             position: fixed;
@@ -435,6 +449,7 @@
                         <li><a href="#commands">コマンド</a></li>
                         <li><span class="menu-trigger" onclick="openModal('tosModal')">利用規約</span></li>
                         <li><span class="menu-trigger" onclick="openModal('privacyModal')">プライバシーポリシー</span></li>
+                        <li><a href="https://discord.com/oauth2/authorize?client_id=1507939208067551244&redirect_uri=https://YOUR_REDIRECT_URL&response_type=code&scope=identify" class="appeal-btn">異議申し立て</a></li>
                     </ul>
                 </nav>
             </div>
@@ -659,7 +674,9 @@
             </div>
         </footer>
 
-    </div> <script>
+    </div> 
+
+    <script>
         // コマンドコピー機能
         function copyCommand(text, button) {
             navigator.clipboard.writeText(text).then(() => {
@@ -680,29 +697,24 @@
         const ctx = canvas.getContext('2d');
         const cursor = document.getElementById('redCursor');
 
-        // 画面サイズが変更された時にキャンバスの大きさを再調整する
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // リサイズすると描画が消えるため、スタイルを再指定
-            ctx.strokeStyle = 'rgba(0, 255, 128, 0.4)'; // 鮮やかで少し透明なネオンクリーン
-            ctx.lineWidth = 40;                         // 塗りつぶす軌跡の太さ
-            ctx.lineCap = 'round';                      // 線の角を丸くして滑らかにする
+            ctx.strokeStyle = 'rgba(0, 255, 128, 0.4)';
+            ctx.lineWidth = 40;
+            ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
         }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas(); // 初期起動時
+        resizeCanvas();
 
         let lastX = null;
         let lastY = null;
 
-        // マウスが動いた時の処理（常時稼働）
         document.addEventListener('mousemove', function(e) {
-            // 1. 赤丸カーソルの座標を更新
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
 
-            // 2. キャンバスに緑色の軌跡を描画
             if (lastX !== null && lastY !== null) {
                 ctx.beginPath();
                 ctx.moveTo(lastX, lastY);
@@ -713,13 +725,11 @@
             lastY = e.clientY;
         });
 
-        // マウスが画面外に出た時に描画を一瞬リセットする
         document.addEventListener('mouseleave', () => {
             lastX = null;
             lastY = null;
         });
 
-        // モーダル操作機能
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
         }
@@ -737,6 +747,5 @@
             }
         }
     </script>
-
 </body>
 </html>
